@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Warehouse Pro - Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dashboard-v2">
+    <aside class="sidebar">
+        <div class="logo">Warelytics</div>
+        <nav style="flex: 1;">
+            <a href="#" class="nav-link active" onclick="showView('dashboard')">
+                <i class="fa-solid fa-chart-line"></i> Analytics View
+            </a>
+            <a href="#" class="nav-link" onclick="showView('kanban')">
+                <i class="fa-solid fa-layer-group"></i> Kanban Board
+            </a>
+            <a href="#" id="admin-add-btn" class="nav-link" onclick="openAddModal()">
+                <i class="fa-solid fa-plus-circle"></i> New Return
+            </a>
+            <a href="#" class="nav-link" onclick="logout()" style="margin-top: auto;">
+                <i class="fa-solid fa-power-off"></i> Exit System
+            </a>
+        </nav>
+    </aside>
+
+    <main class="content-area">
+        <header class="header-top">
+            <div>
+                <h1 id="welcome-msg" style="font-size: 1.75rem; font-weight: 800;">Operation Terminal</h1>
+                <p id="system-status" style="color: var(--text-dim); font-size: 0.85rem;">Connected to <span id="company-name">...</span> • <span id="user-display">...</span></p>
+            </div>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+                    <i class="fa-solid fa-circle-half-stroke"></i>
+                </button>
+                <div id="admin-controls">
+                    <button class="btn-auth" onclick="openAddModal()">+ Log Product</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Predictive Analytics Alert -->
+        <div id="prediction-alert" class="prediction-box">
+            <i class="fa-solid fa-bolt" style="color: #fbbf24;"></i>
+            <div>
+                <strong style="font-size: 0.9rem;">Predictive Insight:</strong>
+                <span id="prediction-text" style="font-size: 0.85rem;">Analyzing trend patterns...</span>
+            </div>
+        </div>
+
+        <!-- KPI Stats -->
+        <section class="stats-grid" id="stats-container">
+            <div class="s-card">
+                <h4>Registered Items</h4>
+                <div class="num" id="stat-total">0</div>
+            </div>
+            <div class="s-card" style="border-left: 4px solid var(--inspection);">
+                <h4>Inspection Queue</h4>
+                <div class="num" id="stat-inspection">0</div>
+            </div>
+            <div class="s-card" style="border-left: 4px solid var(--repair);">
+                <h4>Avg Process Time</h4>
+                <div class="num" id="stat-avg-time">1.2d</div>
+            </div>
+            <div class="s-card" style="border-left: 4px solid var(--resale);">
+                <h4>Recovery Rate</h4>
+                <div class="num" id="stat-success">0%</div>
+            </div>
+            <div class="s-card" style="border-left: 4px solid var(--scrap);">
+                <h4>Scrap Percentage</h4>
+                <div class="num" id="stat-scrap-perc">0%</div>
+            </div>
+        </section>
+
+        <!-- Search & Control Toolbar -->
+        <section class="toolbar">
+            <input type="text" id="search-input" class="search-input" placeholder="Search product name or serial...">
+            <div class="control-group">
+                <label for="filter-warehouse"><i class="fa-solid fa-building"></i> Facility</label>
+                <select id="filter-warehouse" class="search-input">
+                    <option value="">All Warehouses</option>
+                    <option value="Chennai">Chennai</option>
+                    <option value="Delhi">Delhi</option>
+                    <option value="Mumbai">Mumbai</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="filter-start"><i class="fa-solid fa-calendar-alt"></i> Start Date</label>
+                <input type="date" id="filter-start" class="search-input">
+            </div>
+            <div class="control-group">
+                <label for="filter-end"><i class="fa-solid fa-calendar-alt"></i> End Date</label>
+                <input type="date" id="filter-end" class="search-input">
+            </div>
+            <button class="btn-auth" style="background: #10b981;" onclick="exportReport('csv')"><i class="fa-solid fa-file-csv"></i></button>
+            <button class="btn-auth" style="background: #3b82f6;" onclick="exportReport('excel')"><i class="fa-solid fa-file-excel"></i></button>
+        </section>
+
+        <!-- Views Container -->
+        <div id="dashboard-view">
+            <section class="table-box">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product Info</th>
+                            <th>Value ($)</th>
+                            <th>Warehouse / Location</th>
+                            <th>Timeline Details</th>
+                            <th>Current State</th>
+                            <th>Operations</th>
+                        </tr>
+                    </thead>
+                    <tbody id="returns-table">
+                        <!-- JS Loaded -->
+                    </tbody>
+                </table>
+            </section>
+            <div id="pagination" style="margin-top: 1.5rem; display: flex; gap: 0.5rem; justify-content: center;"></div>
+        </div>
+
+        <div id="kanban-view" style="display: none;">
+            <div class="kanban-board">
+                <div class="kanban-col" id="col-received" ondrop="drop(event, 'Received')" ondragover="allowDrop(event)">
+                    <h3>Received</h3>
+                    <div class="kanban-items"></div>
+                </div>
+                <div class="kanban-col" id="col-inspection" ondrop="drop(event, 'Inspection')" ondragover="allowDrop(event)">
+                    <h3>Inspection</h3>
+                    <div class="kanban-items"></div>
+                </div>
+                <div class="kanban-col" id="col-repair" ondrop="drop(event, 'Repair')" ondragover="allowDrop(event)">
+                    <h3>Repair</h3>
+                    <div class="kanban-items"></div>
+                </div>
+                <div class="kanban-col" id="col-resale" ondrop="drop(event, 'Resale')" ondragover="allowDrop(event)">
+                    <h3>Resale</h3>
+                    <div class="kanban-items"></div>
+                </div>
+                <div class="kanban-col" id="col-scrap" ondrop="drop(event, 'Scrap')" ondragover="allowDrop(event)">
+                    <h3>Scrap</h3>
+                    <div class="kanban-items"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytical Charts -->
+        <section class="charts-grid" id="analytics-section">
+            <div class="s-card" style="height: 350px;">
+                <canvas id="dailyChart"></canvas>
+            </div>
+            <div class="s-card" style="height: 350px;">
+                <canvas id="reasonChart"></canvas>
+            </div>
+        </section>
+
+        <section class="charts-grid" style="margin-top: 2rem;">
+            <div class="s-card">
+                <h4>Top 5 Returned Products</h4>
+                <div id="top-products-list" style="margin-top: 1rem; font-size: 0.9rem;"></div>
+            </div>
+            <div class="s-card">
+                <h4>Facility Load Highlights</h4>
+                <div id="facility-highlights" style="margin-top: 1rem; font-size: 0.9rem;"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal for Adding Return -->
+    <div class="modal" id="add-modal">
+        <div class="modal-box">
+            <h2 style="margin-bottom: 2rem;">Log New Return Entry</h2>
+            <form id="add-form" enctype="multipart/form-data">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <input type="text" id="add-name" class="input-field" placeholder="Product Name" required>
+                    <input type="number" id="add-value" class="input-field" placeholder="Product Value ($)" required>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                  <select id="add-category" class="input-field" required>
+                      <option value="" disabled selected>Category</option>
+                      <option value="Electronics">Electronics</option>
+                      <option value="Fashion">Fashion</option>
+                      <option value="Appliances">Appliances</option>
+                      <option value="Audio">Audio</option>
+                  </select>
+                  <select id="add-warehouse" class="input-field" required>
+                      <option value="" disabled selected>Warehouse</option>
+                      <option value="Chennai">Chennai</option>
+                      <option value="Delhi">Delhi</option>
+                      <option value="Mumbai">Mumbai</option>
+                  </select>
+                </div>
+                <textarea id="add-reason" class="input-field" style="height: 80px; resize: none;" placeholder="Reason for return" required></textarea>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                    <div class="control-group">
+                        <label><i class="fa-solid fa-map-pin"></i> Section</label>
+                        <input type="text" id="add-section" class="input-field" placeholder="ex: A1">
+                    </div>
+                    <div class="control-group">
+                        <label><i class="fa-solid fa-layer-group"></i> Rack</label>
+                        <input type="text" id="add-rack" class="input-field" placeholder="ex: R10">
+                    </div>
+                    <div class="control-group">
+                        <label><i class="fa-solid fa-calendar-check"></i> Mfg Date</label>
+                        <input type="date" id="add-mfg" class="input-field" required>
+                    </div>
+                </div>
+                <div class="input-field" style="display: flex; flex-direction: column; gap: 0.5rem; border: 1px dashed var(--border-glass);">
+                  <label style="font-size: 0.75rem; color: var(--text-dim);">Product Photo / Invoice (Optional)</label>
+                  <input type="file" id="add-image" accept="image/*" style="font-size: 0.8rem;">
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                    <button type="submit" class="btn-auth">Register Entry</button>
+                    <button type="button" class="btn-auth" style="background: #334155;" onclick="closeModals()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Decisions -->
+    <div class="modal" id="decision-modal">
+        <div class="modal-box" style="max-width: 400px; text-align: center;">
+            <i class="fa-solid fa-robot" style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;"></i>
+            <h3>Automated Decision System</h3>
+            <p id="decision-prompt" style="margin: 1.5rem 0; font-size: 0.9rem; line-height: 1.5;"></p>
+            <div id="decision-options" style="display: flex; flex-direction: column; gap: 0.75rem;"></div>
+            <button onclick="closeModals()" class="btn-auth" style="background: transparent; margin-top: 1rem;">Discard</button>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

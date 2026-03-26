@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Warelytics</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body class="auth-page">
+    <div class="glass-card">
+        <div class="logo">Warelytics</div>
+        <h2 style="margin-bottom: 0.5rem;">Create Account</h2>
+        <p style="color: var(--text-dim); margin-bottom: 2rem;">Join the logistics management network.</p>
+        
+        <form id="register-form">
+            <input type="text" id="name" class="input-field" placeholder="Full Name" required>
+            <input type="email" id="email" class="input-field" placeholder="Email Address" required>
+            <input type="password" id="password" class="input-field" placeholder="Password" required>
+            <select id="role" class="input-field" required>
+                <option value="" disabled selected>Select Your Role</option>
+                <option value="worker">Warehouse Worker</option>
+                <option value="admin">System Admin</option>
+            </select>
+            <button type="submit" class="btn-auth">Register Now</button>
+        </form>
+        
+        <div style="margin-top: 2rem; font-size: 0.9rem; color: var(--text-dim);">
+            Already have an account? <a href="login.html" style="color: var(--primary); font-weight: 600; text-decoration: none;">Login</a>
+        </div>
+        <div id="error-box" style="margin-top: 1.5rem; color: #ef4444; display: none;"></div>
+    </div>
+
+    <script src="register.js"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Warelytics</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body class="auth-page">
+    <div class="glass-card">
+        <div class="logo">Warelytics</div>
+        <h2 style="margin-bottom: 0.5rem;">Welcome Back</h2>
+        <p style="color: var(--text-dim); margin-bottom: 2rem;">Access your dashboard to manage returns.</p>
+        
+        <form id="loginForm">
+            <input type="email" id="email" class="input-field" placeholder="Email Address" required autocomplete="off">
+            <input type="password" id="password" class="input-field" placeholder="Password" required autocomplete="off">
+            <button type="submit" class="btn-auth">Sign In</button>
+        </form>
+        
+        <div style="margin-top: 2rem; font-size: 0.9rem; color: var(--text-dim);">
+            Don't have an account? <a href="register.html" style="color: var(--primary); font-weight: 600; text-decoration: none;">Create Account</a>
+        </div>
+        
+        <div id="error-box" style="margin-top: 1.5rem; color: #ef4444; display: none; font-size: 0.85rem; background: rgba(239, 68, 68, 0.1); padding: 0.75rem; border-radius: 0.75rem;"></div>
+    </div>
+
+    <script src="login.js"></script>
+</body>
+</html>
